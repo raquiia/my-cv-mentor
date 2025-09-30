@@ -230,21 +230,56 @@ export default function CVEditor() {
                   {cvData.experience && (
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">Expérience</h3>
-                      <div className="text-gray-700 whitespace-pre-wrap">{cvData.experience}</div>
+                      <div className="text-gray-700 space-y-3">
+                        {Array.isArray(cvData.experience) ? (
+                          cvData.experience.map((exp: any, idx: number) => (
+                            <div key={idx} className="mb-3">
+                              <div className="font-semibold">{exp.title}</div>
+                              <div className="text-sm text-gray-600">{exp.company} • {exp.years}</div>
+                              <div className="mt-1">{exp.description}</div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="whitespace-pre-wrap">{cvData.experience}</div>
+                        )}
+                      </div>
                     </div>
                   )}
 
                   {cvData.education && (
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">Formation</h3>
-                      <div className="text-gray-700 whitespace-pre-wrap">{cvData.education}</div>
+                      <div className="text-gray-700 space-y-3">
+                        {Array.isArray(cvData.education) ? (
+                          cvData.education.map((edu: any, idx: number) => (
+                            <div key={idx} className="mb-3">
+                              <div className="font-semibold">{edu.degree}</div>
+                              <div className="text-sm text-gray-600">{edu.university} • {edu.years}</div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="whitespace-pre-wrap">{cvData.education}</div>
+                        )}
+                      </div>
                     </div>
                   )}
 
                   {cvData.skills && (
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">Compétences</h3>
-                      <div className="text-gray-700 whitespace-pre-wrap">{cvData.skills}</div>
+                      <div className="text-gray-700">
+                        {Array.isArray(cvData.skills) ? (
+                          <div className="flex flex-wrap gap-2">
+                            {cvData.skills.map((skill: string, idx: number) => (
+                              <span key={idx} className="px-3 py-1 bg-gray-100 rounded-full text-sm">
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="whitespace-pre-wrap">{cvData.skills}</div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
