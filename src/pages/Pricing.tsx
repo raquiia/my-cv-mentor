@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const packs = [
   {
+    id: "starter",
     name: "Starter",
     price: 9,
     credits: 100,
@@ -19,6 +21,7 @@ const packs = [
     ],
   },
   {
+    id: "pro",
     name: "Pro",
     price: 24,
     credits: 350,
@@ -34,6 +37,7 @@ const packs = [
     ],
   },
   {
+    id: "power",
     name: "Power",
     price: 49,
     credits: 900,
@@ -53,12 +57,24 @@ export default function Pricing() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const handleSelectPack = () => {
+  const handleSelectPack = async (packId: string) => {
     if (!user) {
       navigate("/auth?redirect=/pricing");
-    } else {
-      // TODO: Implement Stripe checkout
-      console.log("Stripe checkout - à implémenter");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { packId },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error: any) {
+      console.error("Checkout error:", error);
     }
   };
 
@@ -111,7 +127,7 @@ export default function Pricing() {
                 <Button
                   className="w-full"
                   variant={pack.popular ? "default" : "outline"}
-                  onClick={handleSelectPack}
+                  onClick={() => handleSelectPack(pack.id)}
                 >
                   Obtenir {pack.name}
                 </Button>

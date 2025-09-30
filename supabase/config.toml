@@ -1,1 +1,16 @@
 project_id = "oeaxjzgxmseglxgbxrzk"
+
+[functions.parse-cv]
+verify_jwt = true
+
+[functions.improve-section]
+verify_jwt = true
+
+[functions.export-cv]
+verify_jwt = true
+
+[functions.create-checkout]
+verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false
