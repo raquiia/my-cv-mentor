@@ -3,10 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Download, Sparkles, Save, Eye } from "lucide-react";
+import { Upload, Download, Sparkles, Save, Eye, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import * as pdfjsLib from 'pdfjs-dist';
+import mammoth from 'mammoth';
+
+// Configure PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
 export default function CVEditor() {
   const navigate = useNavigate();
@@ -16,6 +21,8 @@ export default function CVEditor() {
   const [isUploading, setIsUploading] = useState(false);
   const [isImproving, setIsImproving] = useState(false);
   const [credits, setCredits] = useState(0);
+  const [originalPreviewUrl, setOriginalPreviewUrl] = useState<string | null>(null);
+  const [extractionWarning, setExtractionWarning] = useState<string | null>(null);
 
   // Load user credits
   useEffect(() => {
@@ -44,19 +51,82 @@ export default function CVEditor() {
     }
 
     setIsUploading(true);
+    setExtractionWarning(null);
+    setOriginalPreviewUrl(null);
+    
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      let extractedText = '';
+      const isPDF = file.type === 'application/pdf';
+      
+      if (isPDF) {
+        // Extract text from PDF using pdfjs
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        
+        // Generate thumbnail from first page
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        
+        if (context) {
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport,
+            canvas: canvas,
+          };
+          await page.render(renderContext).promise;
+          setOriginalPreviewUrl(canvas.toDataURL());
+        }
+        
+        // Extract text from all pages
+        const textParts: string[] = [];
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items
+            .map((item: any) => item.str)
+            .join(' ');
+          textParts.push(pageText);
+        }
+        extractedText = textParts.join('\n\n').trim();
+        
+      } else {
+        // Extract text from DOCX using mammoth
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        extractedText = result.value.trim();
+      }
 
+      // Check if extraction was successful
+      if (!extractedText || extractedText.length < 100) {
+        setExtractionWarning(
+          "Le PDF semble scanné ou l'extraction a échoué. Essayez la version DOCX ou un PDF avec texte sélectionnable."
+        );
+        toast.error("Extraction de texte insuffisante");
+        return;
+      }
+
+      // Send extracted text to parse-cv function
       const { data, error } = await supabase.functions.invoke("parse-cv", {
-        body: formData,
+        body: { text: extractedText },
       });
 
       if (error) throw error;
 
-      setCvData(data.cvData);
-      toast.success("CV analysé avec succès !");
+      if (data?.cvData) {
+        // Check if we got meaningful data
+        const hasData = data.cvData.name || data.cvData.experience?.length || data.cvData.education?.length;
+        if (!hasData) {
+          setExtractionWarning("Les informations extraites semblent incomplètes. Vérifiez le fichier.");
+        }
+        setCvData(data.cvData);
+        toast.success("CV analysé avec succès !");
+      }
     } catch (error: any) {
+      console.error('Upload error:', error);
       toast.error(error.message || "Erreur lors de l'upload");
     } finally {
       setIsUploading(false);
@@ -174,6 +244,24 @@ export default function CVEditor() {
                   disabled={isUploading}
                 />
               </label>
+              
+              {extractionWarning && (
+                <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-amber-800">{extractionWarning}</p>
+                </div>
+              )}
+              
+              {originalPreviewUrl && (
+                <div className="mt-4">
+                  <p className="text-xs text-muted-foreground mb-2">CV Original</p>
+                  <img 
+                    src={originalPreviewUrl} 
+                    alt="Aperçu CV" 
+                    className="w-full rounded border"
+                  />
+                </div>
+              )}
             </div>
 
             {cvData && (

@@ -11,63 +11,72 @@ serve(async (req) => {
   }
 
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File;
-    
-    if (!file) {
-      throw new Error('No file provided');
-    }
-
-    const fileType = file.type;
-    const fileName = file.name;
-
-    console.log(`Parsing CV: ${fileName} (${fileType})`);
-
-    // Read file content
-    const arrayBuffer = await file.arrayBuffer();
-    const fileContent = new Uint8Array(arrayBuffer);
-
-    console.log(`File size: ${fileContent.length} bytes, Type: ${fileType}`);
-
-    // Simple text extraction for PDF (basic, works for text-based PDFs)
     let extractedText = '';
     
-    if (fileType === 'application/pdf') {
-      // Basic PDF text extraction - convert to string and extract readable text
-      const decoder = new TextDecoder('utf-8', { fatal: false });
-      const rawText = decoder.decode(fileContent);
+    // Check if request is JSON with text field (preferred method)
+    const contentType = req.headers.get('content-type') || '';
+    
+    if (contentType.includes('application/json')) {
+      const body = await req.json();
+      if (body.text) {
+        extractedText = body.text;
+        console.log(`Received pre-extracted text: ${extractedText.length} characters`);
+      }
+    } else if (contentType.includes('multipart/form-data')) {
+      // Fallback: extract from file (legacy method)
+      const formData = await req.formData();
+      const file = formData.get('file') as File;
       
-      // Extract text between common PDF text markers and clean it
-      const textMatches = rawText.match(/\(([^)]+)\)/g) || [];
-      extractedText = textMatches
-        .map(match => match.replace(/[()]/g, ''))
-        .filter(text => text.length > 1)
-        .join(' ');
+      if (!file) {
+        throw new Error('No file or text provided');
+      }
+
+      const fileType = file.type;
+      const fileName = file.name;
+      console.log(`Parsing CV: ${fileName} (${fileType})`);
+
+      const arrayBuffer = await file.arrayBuffer();
+      const fileContent = new Uint8Array(arrayBuffer);
+      console.log(`File size: ${fileContent.length} bytes, Type: ${fileType}`);
+
+      if (fileType === 'application/pdf') {
+        // Basic PDF text extraction - convert to string and extract readable text
+        const decoder = new TextDecoder('utf-8', { fatal: false });
+        const rawText = decoder.decode(fileContent);
+        
+        // Extract text between common PDF text markers and clean it
+        const textMatches = rawText.match(/\(([^)]+)\)/g) || [];
+        extractedText = textMatches
+          .map(match => match.replace(/[()]/g, ''))
+          .filter(text => text.length > 1)
+          .join(' ');
+        
+        // Also try to extract text between BT/ET markers (PDF text objects)
+        const btMatches = rawText.match(/BT\s+(.*?)\s+ET/gs) || [];
+        const btText = btMatches
+          .map(match => match.replace(/BT|ET|Tf|Td|Tj|TJ|'|"/g, ' '))
+          .join(' ');
+        
+        extractedText = (extractedText + ' ' + btText)
+          .replace(/[^\w\s@.,+\-()]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      } else {
+        // For DOCX and other formats, try basic text extraction
+        const decoder = new TextDecoder('utf-8', { fatal: false });
+        extractedText = decoder.decode(fileContent)
+          .replace(/[^\w\s@.,+\-()]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
       
-      // Also try to extract text between BT/ET markers (PDF text objects)
-      const btMatches = rawText.match(/BT\s+(.*?)\s+ET/gs) || [];
-      const btText = btMatches
-        .map(match => match.replace(/BT|ET|Tf|Td|Tj|TJ|'|"/g, ' '))
-        .join(' ');
-      
-      extractedText = (extractedText + ' ' + btText)
-        .replace(/[^\w\s@.,+\-()]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-    } else {
-      // For DOCX and other formats, try basic text extraction
-      const decoder = new TextDecoder('utf-8', { fatal: false });
-      extractedText = decoder.decode(fileContent)
-        .replace(/[^\w\s@.,+\-()]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
+      console.log(`Extracted text length: ${extractedText.length} characters`);
+      console.log(`First 500 chars: ${extractedText.substring(0, 500)}`);
     }
-
-    console.log(`Extracted text length: ${extractedText.length} characters`);
-    console.log(`First 500 chars: ${extractedText.substring(0, 500)}`);
-
+    
+    // Check if we have extracted text (from either JSON or file)
     if (!extractedText || extractedText.length < 50) {
-      throw new Error('Could not extract readable text from document. Please ensure the PDF is text-based (not scanned).');
+      throw new Error('Could not extract readable text. Please ensure the PDF is text-based (not scanned) or provide valid text.');
     }
 
     // Call Lovable AI for parsing
