@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Download, Sparkles, Save, Eye, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Upload, Download, Sparkles, Save, Eye, AlertCircle, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +18,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dis
 export default function CVEditor() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const previewContainerRef = useRef<HTMLDivElement>(null);
   const [cvData, setCvData] = useState<any>(null);
   const [selectedTemplate, setSelectedTemplate] = useState("moderne");
   const [isUploading, setIsUploading] = useState(false);
@@ -30,6 +31,32 @@ export default function CVEditor() {
   const [zoomLevel, setZoomLevel] = useState(0.85);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  // Calculate optimal zoom based on available space
+  const calculateOptimalZoom = () => {
+    if (!previewContainerRef.current) return 0.85;
+    
+    const containerWidth = previewContainerRef.current.clientWidth;
+    const a4Width = 794; // A4 width in pixels at 96 DPI
+    const padding = 48; // Account for padding
+    const availableWidth = containerWidth - padding;
+    
+    return Math.min(availableWidth / a4Width, 1.2); // Max 120%
+  };
+
+  // Auto-adjust zoom on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const optimalZoom = calculateOptimalZoom();
+      setZoomLevel(optimalZoom);
+    };
+    
+    // Set initial zoom
+    handleResize();
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [cvData]);
 
   // Load user credits
   useEffect(() => {
@@ -279,10 +306,10 @@ export default function CVEditor() {
           </div>
         </div>
 
-        {/* Main Layout */}
+        {/* Main Layout - Responsive Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Panel - Upload & Sections */}
-          <Card className="lg:col-span-3 p-6 space-y-6">
+          <Card className="lg:col-span-3 p-6 space-y-6 order-1">
             <div>
               <h3 className="font-semibold mb-4">Upload CV</h3>
               <label className="cursor-pointer">
@@ -341,10 +368,10 @@ export default function CVEditor() {
           </Card>
 
           {/* Center Panel - Preview */}
-          <Card className="lg:col-span-6 p-6">
-            <div className="flex items-center justify-between mb-4">
+          <Card className="lg:col-span-6 p-6 order-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
               <h3 className="font-semibold">Aperçu</h3>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                 {totalPages > 1 && (
                   <div className="flex items-center gap-2">
                     <Button
@@ -379,14 +406,15 @@ export default function CVEditor() {
               </div>
             </div>
             
-            {/* A4 Preview Container */}
-            <div className="flex flex-col items-center gap-4">
+            {/* A4 Preview Container with ref */}
+            <div ref={previewContainerRef} className="flex flex-col items-center gap-4 w-full">
               {/* Zoom Controls */}
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 <Button 
                   size="sm" 
                   variant="outline"
-                  onClick={() => setZoomLevel(z => Math.max(0.5, z - 0.1))}
+                  onClick={() => setZoomLevel(z => Math.max(0.3, z - 0.1))}
+                  title="Zoom arrière"
                 >
                   -
                 </Button>
@@ -397,16 +425,38 @@ export default function CVEditor() {
                   size="sm" 
                   variant="outline"
                   onClick={() => setZoomLevel(z => Math.min(1.5, z + 0.1))}
+                  title="Zoom avant"
                 >
                   +
                 </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => setZoomLevel(calculateOptimalZoom())}
+                  title="Ajuster à l'écran"
+                >
+                  <Maximize2 className="h-4 w-4" />
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => setZoomLevel(1)}
+                  title="100%"
+                >
+                  100%
+                </Button>
               </div>
 
-              {/* A4 Page */}
-              <div 
-                className={`cv-page-a4 cv-template-${selectedTemplate} shadow-xl`}
-                style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top center' }}
-              >
+              {/* A4 Page - Centered with proper transform origin */}
+              <div className="w-full flex justify-center overflow-x-auto pb-4">
+                <div 
+                  className={`cv-page-a4 cv-template-${selectedTemplate} shadow-xl`}
+                  style={{ 
+                    transform: `scale(${zoomLevel})`, 
+                    transformOrigin: 'center center',
+                    transition: 'transform 0.2s ease-out'
+                  }}
+                >
                   {cvData ? (
                     <div className="cv-preview-content">
                   {/* Template Moderne - 1 colonne avec header */}
@@ -762,12 +812,13 @@ export default function CVEditor() {
                   </p>
                 </div>
               )}
+                </div>
               </div>
             </div>
           </Card>
 
           {/* Right Panel - Templates & Settings */}
-          <Card className="lg:col-span-3 p-6">
+          <Card className="lg:col-span-3 p-6 order-3">
             <Tabs defaultValue="templates">
               <TabsList className="w-full">
                 <TabsTrigger value="templates" className="flex-1">Thèmes</TabsTrigger>
