@@ -27,18 +27,55 @@ serve(async (req) => {
     const arrayBuffer = await file.arrayBuffer();
     const fileContent = new Uint8Array(arrayBuffer);
 
+    console.log(`File size: ${fileContent.length} bytes, Type: ${fileType}`);
+
+    // Simple text extraction for PDF (basic, works for text-based PDFs)
+    let extractedText = '';
+    
+    if (fileType === 'application/pdf') {
+      // Basic PDF text extraction - convert to string and extract readable text
+      const decoder = new TextDecoder('utf-8', { fatal: false });
+      const rawText = decoder.decode(fileContent);
+      
+      // Extract text between common PDF text markers and clean it
+      const textMatches = rawText.match(/\(([^)]+)\)/g) || [];
+      extractedText = textMatches
+        .map(match => match.replace(/[()]/g, ''))
+        .filter(text => text.length > 1)
+        .join(' ');
+      
+      // Also try to extract text between BT/ET markers (PDF text objects)
+      const btMatches = rawText.match(/BT\s+(.*?)\s+ET/gs) || [];
+      const btText = btMatches
+        .map(match => match.replace(/BT|ET|Tf|Td|Tj|TJ|'|"/g, ' '))
+        .join(' ');
+      
+      extractedText = (extractedText + ' ' + btText)
+        .replace(/[^\w\s@.,+\-()]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    } else {
+      // For DOCX and other formats, try basic text extraction
+      const decoder = new TextDecoder('utf-8', { fatal: false });
+      extractedText = decoder.decode(fileContent)
+        .replace(/[^\w\s@.,+\-()]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    console.log(`Extracted text length: ${extractedText.length} characters`);
+    console.log(`First 500 chars: ${extractedText.substring(0, 500)}`);
+
+    if (!extractedText || extractedText.length < 50) {
+      throw new Error('Could not extract readable text from document. Please ensure the PDF is text-based (not scanned).');
+    }
+
     // Call Lovable AI for parsing
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
-
-    // Convert to base64 for document parsing with Gemini
-    const base64Content = btoa(String.fromCharCode(...fileContent));
     
-    console.log(`File size: ${fileContent.length} bytes, Type: ${fileType}`);
-    
-    // Prepare content for Gemini - it can read PDF/DOCX directly
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -50,16 +87,13 @@ serve(async (req) => {
         messages: [
           {
             role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: `Tu es un expert en extraction d'informations de CV. Analyse ce document CV et extrait TOUTES les informations en format JSON structuré.
+            content: `Tu es un expert en extraction d'informations de CV. Analyse ce texte extrait d'un CV et extrait TOUTES les informations en format JSON structuré.
 
 IMPORTANT: 
-- Extrait les VRAIES informations du document, pas des exemples génériques
-- Pour experience et education, crée des tableaux d'objets
-- Pour skills, crée un tableau de strings
-- Si une information n'est pas trouvée, mets une chaîne vide
+- Extrait les VRAIES informations du texte, pas des exemples génériques
+- Pour experience et education, crée des tableaux d'objets avec toutes les entrées trouvées
+- Pour skills, crée un tableau de strings avec toutes les compétences trouvées
+- Si une information n'est pas trouvée, mets une chaîne vide ou un tableau vide
 
 Format JSON attendu:
 {
@@ -90,15 +124,10 @@ Format JSON attendu:
   }
 }
 
-Réponds UNIQUEMENT avec le JSON valide, sans markdown, sans texte additionnel.`
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: `data:${fileType};base64,${base64Content}`
-                }
-              }
-            ]
+Texte du CV:
+${extractedText}
+
+Réponds UNIQUEMENT avec le JSON valide, sans markdown ni texte additionnel.`
           }
         ],
         temperature: 0.1,
