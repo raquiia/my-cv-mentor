@@ -12,7 +12,7 @@ export default function CVEditor() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [cvData, setCvData] = useState<any>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState("modern");
+  const [selectedTemplate, setSelectedTemplate] = useState("moderne");
   const [isUploading, setIsUploading] = useState(false);
   const [isImproving, setIsImproving] = useState(false);
   const [credits, setCredits] = useState(0);
@@ -127,9 +127,9 @@ export default function CVEditor() {
   };
 
   const templates = [
-    { id: "modern", name: "Moderne", preview: "/templates/modern.jpg" },
-    { id: "classic", name: "Classique", preview: "/templates/classic.jpg" },
-    { id: "creative", name: "Créatif", preview: "/templates/creative.jpg" },
+    { id: "moderne", name: "Moderne", preview: "/templates/moderne.jpg" },
+    { id: "classique", name: "Classique", preview: "/templates/classique.jpg" },
+    { id: "creatif", name: "Créatif", preview: "/templates/creatif.jpg" },
     { id: "tech", name: "Tech", preview: "/templates/tech.jpg" },
   ];
 
@@ -280,7 +280,11 @@ export default function CVEditor() {
                     }`}
                     onClick={() => setSelectedTemplate(template.id)}
                   >
-                    <div className="aspect-[3/4] bg-gradient-to-br from-primary/10 to-secondary/10 rounded mb-2" />
+                    <img 
+                      src={template.preview} 
+                      alt={template.name}
+                      className="aspect-[3/4] w-full object-cover rounded mb-2"
+                    />
                     <p className="text-sm font-medium text-center">{template.name}</p>
                   </div>
                 ))}
