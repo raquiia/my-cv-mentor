@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const packs = [
   {
@@ -58,6 +59,14 @@ export default function Pricing() {
   const { user } = useAuth();
 
   const handleSelectPack = async (packId: string) => {
+    // TEMPORAIREMENT DÉSACTIVÉ - Réactiver après configuration Stripe
+    toast({
+      title: "Paiements temporairement désactivés",
+      description: "Les paiements seront réactivés après la migration du projet.",
+      variant: "default",
+    });
+    
+    /* Code à réactiver:
     if (!user) {
       navigate("/auth?redirect=/pricing");
       return;
@@ -76,6 +85,7 @@ export default function Pricing() {
     } catch (error: any) {
       console.error("Checkout error:", error);
     }
+    */
   };
 
   return (
@@ -86,6 +96,11 @@ export default function Pricing() {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Choisissez le pack qui correspond à vos besoins. Plus de crédits, plus d'économies.
           </p>
+          <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg max-w-2xl mx-auto">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              ⚠️ <strong>Paiements temporairement désactivés</strong> - En cours de migration. Les paiements seront réactivés prochainement.
+            </p>
+          </div>
           <p className="text-sm text-muted-foreground mt-4">
             🎁 <strong>Offre de lancement :</strong> 3 crédits gratuits pour tester la plateforme
           </p>
