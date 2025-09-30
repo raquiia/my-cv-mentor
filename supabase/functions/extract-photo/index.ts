@@ -39,13 +39,17 @@ serve(async (req) => {
             content: [
               {
                 type: 'text',
-                text: `Analyse cette page de CV et détecte s'il y a une photo de profil du candidat (pas un logo d'entreprise, mais bien la photo personnelle du candidat).
-                
-Si tu détectes une photo de profil:
-- Réponds uniquement avec: {"hasPhoto": true, "description": "brève description de l'emplacement de la photo"}
+                text: `Analyse cette page de CV et détecte s'il y a une photo de profil du candidat (pas un logo d'entreprise, pas un screenshot de page entière, mais bien la PHOTO PERSONNELLE du candidat - généralement un portrait en haut du CV).
 
-Si aucune photo de profil n'est détectée:
-- Réponds uniquement avec: {"hasPhoto": false, "description": "pas de photo détectée"}
+CRITIQUE: Je ne veux PAS l'image entière de la page, je veux UNIQUEMENT la zone où se trouve la photo du candidat.
+
+Si tu détectes une photo de profil personnelle du candidat:
+- Réponds avec: {"hasPhoto": true, "description": "position et caractéristiques de la photo", "coordinates": {"x": position_x_en_pourcentage, "y": position_y_en_pourcentage, "width": largeur_en_pourcentage, "height": hauteur_en_pourcentage}}
+- Les coordonnées doivent être en pourcentage (0-100) de la page totale
+- Exemple: une photo ronde de 3cm en haut à gauche d'une page A4 = {"x": 5, "y": 5, "width": 10, "height": 10}
+
+Si aucune photo de profil n'est détectée OU si c'est juste un screenshot de page:
+- Réponds avec: {"hasPhoto": false, "description": "pas de photo personnelle détectée"}
 
 Réponds UNIQUEMENT avec le JSON, sans markdown ni texte additionnel.`
               },

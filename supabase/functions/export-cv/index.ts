@@ -491,6 +491,7 @@ serve(async (req) => {
                 <div class="contact-info">
                   ${cvData.contact.email ? `<span>${cvData.contact.email}</span>` : ''}
                   ${cvData.contact.phone ? `<span>${cvData.contact.phone}</span>` : ''}
+                  ${cvData.contact.address ? `<span>${cvData.contact.address}</span>` : ''}
                   ${cvData.contact.linkedin ? `<span>${cvData.contact.linkedin}</span>` : ''}
                 </div>
               ` : ''}
@@ -517,6 +518,7 @@ serve(async (req) => {
                   <div class="contact-list">
                     ${cvData.contact.email ? `<p>${cvData.contact.email}</p>` : ''}
                     ${cvData.contact.phone ? `<p>${cvData.contact.phone}</p>` : ''}
+                    ${cvData.contact.address ? `<p>${cvData.contact.address}</p>` : ''}
                     ${cvData.contact.linkedin ? `<p>${cvData.contact.linkedin}</p>` : ''}
                   </div>
                 </section>
@@ -543,6 +545,7 @@ serve(async (req) => {
               <div class="contact-list">
                 ${cvData.contact.email ? `<p>✉ ${cvData.contact.email}</p>` : ''}
                 ${cvData.contact.phone ? `<p>📞 ${cvData.contact.phone}</p>` : ''}
+                ${cvData.contact.address ? `<p>📍 ${cvData.contact.address}</p>` : ''}
                 ${cvData.contact.linkedin ? `<p>💼 ${cvData.contact.linkedin}</p>` : ''}
               </div>
             </section>
@@ -566,6 +569,7 @@ serve(async (req) => {
                 <div class="tech-contact">
                   ${cvData.contact.email ? `<code>${cvData.contact.email}</code>` : ''}
                   ${cvData.contact.phone ? `<code>${cvData.contact.phone}</code>` : ''}
+                  ${cvData.contact.address ? `<code>${cvData.contact.address}</code>` : ''}
                   ${cvData.contact.linkedin ? `<code>${cvData.contact.linkedin}</code>` : ''}
                 </div>
               ` : ''}

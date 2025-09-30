@@ -129,6 +129,7 @@ Format JSON attendu:
   "contact": {
     "email": "email@example.com",
     "phone": "+33 6 12 34 56 78",
+    "address": "adresse complète du domicile",
     "linkedin": "url linkedin"
   }
 }

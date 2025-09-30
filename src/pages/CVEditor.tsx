@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Download, Sparkles, Save, Eye, AlertCircle } from "lucide-react";
+import { Upload, Download, Sparkles, Save, Eye, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,6 +28,8 @@ export default function CVEditor() {
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const [extractionWarning, setExtractionWarning] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(0.85);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Load user credits
   useEffect(() => {
@@ -88,18 +90,44 @@ export default function CVEditor() {
           const highResImage = canvas.toDataURL('image/jpeg', 0.95);
           setOriginalPreviewUrl(highResImage);
           
-          // Extract profile photo using AI vision
+          // Extract profile photo using AI vision with coordinates
           try {
             const { data: photoData, error: photoError } = await supabase.functions.invoke('extract-photo', {
               body: { imageDataUrl: highResImage }
             });
             
-            if (!photoError && photoData?.hasPhoto) {
-              console.log('Profile photo detected:', photoData.description);
-              // For now, use the full page as photo - in future, could crop to detected region
-              setProfilePhotoUrl(highResImage);
+            if (!photoError && photoData?.hasPhoto && photoData?.coordinates) {
+              console.log('Profile photo detected with coordinates:', photoData);
+              
+              // Crop the photo using AI-detected coordinates
+              const coords = photoData.coordinates;
+              const cropCanvas = document.createElement('canvas');
+              const cropContext = cropCanvas.getContext('2d');
+              
+              // Calculate pixel positions from percentages
+              const cropX = (coords.x / 100) * canvas.width;
+              const cropY = (coords.y / 100) * canvas.height;
+              const cropWidth = (coords.width / 100) * canvas.width;
+              const cropHeight = (coords.height / 100) * canvas.height;
+              
+              cropCanvas.width = cropWidth;
+              cropCanvas.height = cropHeight;
+              
+              // Create image from canvas
+              const img = new Image();
+              img.src = highResImage;
+              await new Promise((resolve) => { img.onload = resolve; });
+              
+              // Draw cropped portion
+              cropContext!.drawImage(
+                img,
+                cropX, cropY, cropWidth, cropHeight,
+                0, 0, cropWidth, cropHeight
+              );
+              
+              setProfilePhotoUrl(cropCanvas.toDataURL('image/png'));
             } else {
-              console.log('No profile photo detected');
+              console.log('No profile photo detected or no coordinates returned');
             }
           } catch (photoError) {
             console.warn('Photo extraction failed:', photoError);
@@ -316,15 +344,38 @@ export default function CVEditor() {
           <Card className="lg:col-span-6 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">Aperçu</h3>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => handleExport("pdf")}>
-                  <Download className="h-4 w-4 mr-2" />
-                  PDF
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => handleExport("docx")}>
-                  <Download className="h-4 w-4 mr-2" />
-                  DOCX
-                </Button>
+              <div className="flex items-center gap-4">
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm">Page {currentPage}/{totalPages}</span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => handleExport("pdf")}>
+                    <Download className="h-4 w-4 mr-2" />
+                    PDF
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleExport("docx")}>
+                    <Download className="h-4 w-4 mr-2" />
+                    DOCX
+                  </Button>
+                </div>
               </div>
             </div>
             
@@ -376,6 +427,7 @@ export default function CVEditor() {
                             <div className="contact-info">
                               {cvData.contact.email && <span>{cvData.contact.email}</span>}
                               {cvData.contact.phone && <span>{cvData.contact.phone}</span>}
+                              {cvData.contact.address && <span>{cvData.contact.address}</span>}
                               {cvData.contact.linkedin && <span>{cvData.contact.linkedin}</span>}
                             </div>
                           )}
@@ -383,14 +435,14 @@ export default function CVEditor() {
                       </div>
                       
                       {cvData.summary && (
-                        <section>
+                        <section className="cv-section">
                           <h2>Résumé</h2>
                           <p>{cvData.summary}</p>
                         </section>
                       )}
 
                       {cvData.experience && (
-                        <section>
+                        <section className="cv-section">
                           <h2>Expérience</h2>
                           {Array.isArray(cvData.experience) ? (
                             cvData.experience.map((exp: any, idx: number) => (
@@ -407,7 +459,7 @@ export default function CVEditor() {
                       )}
 
                       {cvData.education && (
-                        <section>
+                        <section className="cv-section">
                           <h2>Formation</h2>
                           {Array.isArray(cvData.education) ? (
                             cvData.education.map((edu: any, idx: number) => (
@@ -423,7 +475,7 @@ export default function CVEditor() {
                       )}
 
                       {cvData.skills && (
-                        <section>
+                        <section className="cv-section">
                           <h2>Compétences</h2>
                           {Array.isArray(cvData.skills) ? (
                             <div className="skills-grid">
