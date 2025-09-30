@@ -33,9 +33,12 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Convert to base64 for text extraction (simplified for MVP)
-    const text = new TextDecoder().decode(fileContent);
+    // Convert to base64 for document parsing with Gemini
+    const base64Content = btoa(String.fromCharCode(...fileContent));
     
+    console.log(`File size: ${fileContent.length} bytes, Type: ${fileType}`);
+    
+    // Prepare content for Gemini - it can read PDF/DOCX directly
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -46,27 +49,59 @@ serve(async (req) => {
         model: 'google/gemini-2.5-flash',
         messages: [
           {
-            role: 'system',
-            content: `Tu es un expert en parsing de CV. Extrait les informations suivantes au format JSON:
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: `Tu es un expert en extraction d'informations de CV. Analyse ce document CV et extrait TOUTES les informations en format JSON structuré.
+
+IMPORTANT: 
+- Extrait les VRAIES informations du document, pas des exemples génériques
+- Pour experience et education, crée des tableaux d'objets
+- Pour skills, crée un tableau de strings
+- Si une information n'est pas trouvée, mets une chaîne vide
+
+Format JSON attendu:
 {
-  "name": "nom complet",
-  "title": "titre professionnel",
-  "summary": "résumé professionnel",
-  "experience": "expériences professionnelles",
-  "education": "formation",
-  "skills": "compétences",
-  "languages": "langues",
-  "contact": { "email": "", "phone": "", "linkedin": "" }
+  "name": "nom complet exact du candidat",
+  "title": "titre professionnel actuel",
+  "summary": "résumé professionnel ou objectif de carrière",
+  "experience": [
+    {
+      "title": "titre du poste",
+      "company": "nom de l'entreprise",
+      "years": "période (ex: 2020-2023)",
+      "description": "description des responsabilités"
+    }
+  ],
+  "education": [
+    {
+      "degree": "diplôme obtenu",
+      "university": "nom de l'établissement",
+      "years": "période (ex: 2015-2019)"
+    }
+  ],
+  "skills": ["compétence1", "compétence2", "compétence3"],
+  "languages": "langues parlées avec niveaux",
+  "contact": {
+    "email": "email@example.com",
+    "phone": "+33 6 12 34 56 78",
+    "linkedin": "url linkedin"
+  }
 }
 
-Réponds UNIQUEMENT avec le JSON, sans markdown ni texte additionnel.`
-          },
-          {
-            role: 'user',
-            content: `Parse ce CV:\n\n${text.substring(0, 10000)}`
+Réponds UNIQUEMENT avec le JSON valide, sans markdown, sans texte additionnel.`
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:${fileType};base64,${base64Content}`
+                }
+              }
+            ]
           }
         ],
-        temperature: 0.3,
+        temperature: 0.1,
       }),
     });
 
