@@ -36,25 +36,27 @@ serve(async (req) => {
           height: 297mm;
           margin: 0;
           padding: 0;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
         }
         body { 
           line-height: 1.6;
           font-size: 11pt;
         }
         .cv-preview-content {
-          padding: 2.5rem;
+          width: 100%;
           height: 100%;
           overflow: hidden;
           box-sizing: border-box;
         }
-        section { margin-bottom: 1.5rem; }
-        .entry { margin-bottom: 1.25rem; }
+        section { margin-bottom: 1.25rem; }
+        .entry { margin-bottom: 1rem; }
         .meta {
-          font-size: 0.875rem;
-          color: #6b7280;
+          font-size: 0.85rem;
+          opacity: 0.8;
           margin-top: 0.25rem;
         }
-        p { margin-bottom: 0.5rem; }
+        p { margin-bottom: 0.5rem; line-height: 1.7; }
       `;
       
       const styles = {
@@ -62,32 +64,38 @@ serve(async (req) => {
           body { 
             font-family: 'Inter', 'Segoe UI', sans-serif;
             color: #1a1a1a;
-            background: #ffffff;
+            background: linear-gradient(180deg, #5DADE2 0%, #3498DB 50%, #2E86C1 100%);
+          }
+          .moderne-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
           }
           .moderne-header {
+            background: white;
+            padding: 2rem 2.5rem;
             display: flex;
             align-items: center;
             gap: 1.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 3px solid #2563eb;
-            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           }
           .moderne-photo {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid #2563eb;
+            border: 4px solid #3498DB;
           }
-          h1 { 
-            color: #2563eb; 
+          .moderne-header h1 { 
+            color: #2C3E50; 
             font-size: 2rem; 
-            font-weight: 700; 
-            margin-bottom: 0.5rem;
+            font-weight: 800; 
+            margin: 0 0 0.25rem 0;
           }
           .title-text {
             font-size: 1.125rem;
-            color: #6b7280;
+            color: #5DADE2;
+            font-weight: 600;
             margin-bottom: 0.5rem;
           }
           .contact-info {
@@ -95,20 +103,30 @@ serve(async (req) => {
             flex-wrap: wrap;
             gap: 1rem;
             font-size: 0.875rem;
-            color: #6b7280;
+            color: #7F8C8D;
+          }
+          section {
+            padding: 1.5rem 2.5rem;
+          }
+          section:nth-child(even) {
+            background: rgba(255, 255, 255, 0.95);
+            color: #2C3E50;
+          }
+          section:nth-child(odd) {
+            background: rgba(52, 152, 219, 0.15);
+            color: white;
           }
           h2 { 
-            color: #2563eb; 
-            font-size: 1.25rem; 
-            font-weight: 600; 
-            margin-top: 1.5rem; 
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #2563eb;
+            font-size: 1.35rem; 
+            font-weight: 700; 
+            margin: 0 0 1rem 0;
+            text-transform: uppercase;
           }
+          section:nth-child(even) h2 { color: #3498DB; }
+          section:nth-child(odd) h2 { color: white; }
           h3 { 
-            font-size: 1.1rem; 
-            font-weight: 600; 
+            font-size: 1.05rem; 
+            font-weight: 700; 
             margin-bottom: 0.25rem;
           }
           .skills-grid {
@@ -118,8 +136,9 @@ serve(async (req) => {
           }
           .skill-tag {
             padding: 0.5rem 1rem;
-            background: #f3f4f6;
-            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
             font-size: 0.875rem;
             display: inline-block;
           }
@@ -127,147 +146,171 @@ serve(async (req) => {
         classique: baseStyles + `
           body { 
             font-family: Georgia, 'Times New Roman', serif;
-            color: #1a1a1a;
-            background: #f8f9fa;
+            color: #2C3E50;
+            background: #FDFEFE;
           }
           .cv-preview-content {
-            background: transparent;
+            padding: 3rem 2.5rem 2.5rem 2.5rem;
           }
           .classique-header { 
             text-align: center; 
             padding-bottom: 1.5rem;
-            border-bottom: 3px double #e5e7eb;
-            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #2C3E50;
+            margin-bottom: 2rem;
           }
           .classique-photo {
-            width: 100px;
-            height: 100px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #333;
-            margin: 0 auto 1rem;
+            border: 5px solid #2C3E50;
+            margin: 0 auto 1.25rem;
             display: block;
           }
           h1 { 
-            font-size: 2.25rem; 
+            font-size: 2.5rem; 
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin: 0 0 0.5rem 0;
+            text-transform: uppercase;
           }
           .title-text {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-style: italic;
-            color: #6b7280;
+            color: #7F8C8D;
           }
           .classique-grid {
             display: grid;
-            grid-template-columns: 180px 1fr;
-            gap: 2rem;
+            grid-template-columns: 220px 1fr;
+            gap: 2.5rem;
           }
           .classique-sidebar { 
-            border-right: 1px solid #e5e7eb; 
-            padding-right: 1.5rem;
+            border-right: 2px solid #ECF0F1; 
+            padding-right: 2rem;
           }
           .classique-sidebar .contact-list {
-            font-size: 0.875rem;
-            line-height: 1.6;
+            font-size: 0.9rem;
+            line-height: 1.8;
           }
           .classique-sidebar ul {
             list-style: none;
             padding: 0;
           }
           .classique-sidebar li {
-            margin-bottom: 0.5rem;
-            padding-left: 1rem;
+            margin-bottom: 0.65rem;
+            padding-left: 1.25rem;
             position: relative;
           }
           .classique-sidebar li::before {
-            content: "•";
+            content: "▪";
             position: absolute;
             left: 0;
+            font-size: 1.1rem;
           }
           h2 {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 0.5rem;
-            margin-top: 1.75rem;
+            letter-spacing: 0.1em;
+            border-bottom: 1px solid #BDC3C7;
+            padding-bottom: 0.4rem;
+            margin-top: 0;
             margin-bottom: 0.75rem;
           }
           h3 { 
             font-size: 1.1rem; 
-            font-weight: 600; 
-            font-style: italic;
+            font-weight: 700;
           }
         `,
         creatif: baseStyles + `
           body { 
             font-family: 'Poppins', 'Arial', sans-serif;
-            color: white;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #2C3E50;
+            background: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
           }
           .cv-preview-content {
-            padding: 2.5rem;
-            background: transparent;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            height: 100%;
           }
-          .creatif-header {
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
+          .creatif-sidebar {
+            background: linear-gradient(180deg, #58D68D 0%, #27AE60 100%);
+            padding: 2.5rem 1.75rem;
             color: white;
-            padding: 2rem;
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            margin-bottom: 1rem;
           }
           .creatif-photo {
-            width: 100px;
-            height: 100px;
-            border-radius: 1rem;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
             object-fit: cover;
-            border: 4px solid white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 5px solid white;
+            margin: 0 auto 1.5rem;
+            display: block;
           }
-          h1 { 
-            color: white;
-            font-size: 2.5rem;
+          .creatif-sidebar h1 {
+            font-size: 1.75rem;
             font-weight: 800;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: white;
+            text-align: center;
+            margin: 0 0 0.5rem 0;
           }
-          .title-text {
-            font-size: 1.25rem;
-            color: rgba(255, 255, 255, 0.9);
+          .creatif-sidebar .title-text {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            margin-bottom: 1.5rem;
           }
-          .creatif-contact {
-            background: white;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            font-size: 0.875rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            margin-bottom: 1rem;
+          .creatif-sidebar section {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
           }
-          .creatif-section {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            border-left: 4px solid #7c3aed;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            margin-bottom: 1rem;
-          }
-          h2 { 
-            color: #7c3aed; 
-            font-size: 1.5rem;
+          .creatif-sidebar h2 {
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            color: white;
+            margin: 0 0 0.75rem 0;
+            text-transform: uppercase;
           }
-          h3 { 
-            color: #2563eb; 
-            font-size: 1.2rem; 
+          .creatif-sidebar .contact-list p {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+          }
+          .creatif-sidebar ul {
+            list-style: none;
+            padding: 0;
+          }
+          .creatif-sidebar li {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            position: relative;
+          }
+          .creatif-sidebar li::before {
+            content: "●";
+            position: absolute;
+            left: 0;
+          }
+          .creatif-main {
+            background: white;
+            padding: 2.5rem;
+          }
+          .creatif-main section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #F093FB;
+          }
+          .creatif-main h2 { 
+            color: #F5576C; 
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 0 1rem 0;
+            text-transform: uppercase;
+          }
+          .creatif-main h3 { 
+            color: #2C3E50; 
+            font-size: 1.15rem; 
             font-weight: 700;
           }
           .skills-creative {
@@ -277,93 +320,118 @@ serve(async (req) => {
           }
           .skill-creative {
             padding: 0.5rem 1rem;
-            background: rgba(37, 99, 235, 0.1);
-            border: 2px solid #2563eb;
-            border-radius: 9999px;
+            background: rgba(240, 147, 251, 0.2);
+            border: 2px solid #F5576C;
+            border-radius: 20px;
             font-size: 0.875rem;
             font-weight: 600;
-            color: #2563eb;
+            color: #F5576C;
             display: inline-block;
           }
         `,
         tech: baseStyles + `
           body { 
-            font-family: 'Courier New', monospace;
-            color: #c9d1d9;
-            background: #0d1117;
+            font-family: 'Roboto', 'Arial', sans-serif;
+            color: #2C3E50;
+            background: #F8F9FA;
+            position: relative;
+          }
+          body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, #8E44AD 0%, #9B59B6 50%, #BB8FCE 100%);
+            clip-path: polygon(0 0, 100% 0, 100% 180px, 0 240px);
+            z-index: 0;
           }
           .cv-preview-content {
             padding: 2.5rem;
-            background: transparent;
+            position: relative;
+            z-index: 1;
           }
           .tech-header {
-            background: #161b22;
-            padding: 1.5rem;
-            border: 1px solid #30363d;
-            border-radius: 0.5rem;
             display: flex;
             align-items: center;
-            gap: 1.5rem;
-            margin-bottom: 1rem;
+            gap: 2rem;
+            padding-bottom: 1.5rem;
+            position: relative;
+            z-index: 2;
           }
           .tech-photo {
-            width: 80px;
-            height: 80px;
-            border-radius: 0.5rem;
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
             object-fit: cover;
-            border: 2px solid #22c55e;
+            border: 4px solid white;
           }
-          h1 { 
-            color: #22c55e;
-            font-size: 2rem;
+          .tech-header h1 { 
+            color: white;
+            font-size: 2.25rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin: 0 0 0.5rem 0;
           }
-          h1::before { content: '> '; }
-          .title-text {
-            font-size: 1rem;
-            color: #8b949e;
+          .tech-header .title-text {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 0.75rem;
           }
           .tech-contact code {
-            padding: 0.25rem 0.5rem;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 0.25rem;
+            padding: 0.35rem 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
             font-size: 0.875rem;
-            color: #58a6ff;
-            margin-right: 1rem;
+            color: white;
+            margin-right: 0.75rem;
           }
-          .tech-section {
-            background: #161b22;
+          section {
+            background: white;
             padding: 1.5rem;
-            border: 1px solid #30363d;
-            border-radius: 0.5rem;
-            border-left: 3px solid #22c55e;
-            margin-bottom: 1rem;
+            border-radius: 12px;
+            border-left: 4px solid #8E44AD;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
           }
           h2 { 
-            color: #22c55e;
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+            color: #8E44AD;
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            text-transform: uppercase;
           }
-          h2::before { content: '## '; color: #4ade80; }
           h3 { 
-            color: #c9d1d9;
+            color: #2C3E50;
             font-size: 1.1rem; 
-            font-weight: 600;
+            font-weight: 700;
           }
-          h3::before { content: '### '; color: #86efac; font-size: 0.9rem; }
           .tech-entry {
             padding: 1rem;
-            background: #0d1117;
-            border: 1px solid #30363d;
-            border-radius: 0.375rem;
+            background: #F8F9FA;
+            border-radius: 8px;
             margin-bottom: 1rem;
+            border: 1px solid #E9ECEF;
           }
           .tech-entry .meta {
-            color: #8b949e;
+            color: #7F8C8D;
             font-style: italic;
+          }
+          .tech-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+          }
+          .tech-skill {
+            padding: 0.5rem 0.875rem;
+            background: rgba(142, 68, 173, 0.1);
+            border: 2px solid #8E44AD;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #8E44AD;
+            display: inline-block;
           }
         `
       };
@@ -377,7 +445,7 @@ serve(async (req) => {
       return arr.map(item => {
         if (type === 'experience') {
           return `
-            <div class="entry">
+            <div class="entry ${template === 'tech' ? 'tech-entry' : ''}">
               <h3>${item.title || ''}</h3>
               <p class="meta">${item.company || ''} • ${item.years || ''}</p>
               <p>${item.description || ''}</p>
@@ -385,7 +453,7 @@ serve(async (req) => {
           `;
         } else {
           return `
-            <div class="entry">
+            <div class="entry ${template === 'tech' ? 'tech-entry' : ''}">
               <h3>${item.degree || ''}</h3>
               <p class="meta">${item.university || ''} • ${item.years || ''}</p>
             </div>
@@ -400,6 +468,8 @@ serve(async (req) => {
         return `<div class="skills-grid">${skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}</div>`;
       } else if (template === 'creatif') {
         return `<div class="skills-creative">${skills.map(s => `<span class="skill-creative">${s}</span>`).join('')}</div>`;
+      } else if (template === 'tech') {
+        return `<div class="tech-skills">${skills.map(s => `<span class="tech-skill">${s}</span>`).join('')}</div>`;
       } else if (template === 'classique') {
         return `<ul>${skills.map(s => `<li>${s}</li>`).join('')}</ul>`;
       } else {
@@ -464,25 +534,26 @@ serve(async (req) => {
       `;
     } else if (template === 'creatif') {
       bodyContent = `
-        <div class="creatif-layout">
-          <div class="creatif-header">
-            <div>
-              <h1>${cvData.name || 'Votre Nom'}</h1>
-              <p class="title-text">${cvData.title || 'Titre Professionnel'}</p>
-            </div>
-          </div>
+        <aside class="creatif-sidebar">
+          <h1>${cvData.name || 'Votre Nom'}</h1>
+          <p class="title-text">${cvData.title || 'Titre Professionnel'}</p>
           ${cvData.contact ? `
-            <div class="creatif-contact">
-              ${cvData.contact.email ? `<span>✉ ${cvData.contact.email}</span>` : ''}
-              ${cvData.contact.phone ? `<span>📞 ${cvData.contact.phone}</span>` : ''}
-              ${cvData.contact.linkedin ? `<span>💼 ${cvData.contact.linkedin}</span>` : ''}
-            </div>
+            <section>
+              <h2>Contact</h2>
+              <div class="contact-list">
+                ${cvData.contact.email ? `<p>✉ ${cvData.contact.email}</p>` : ''}
+                ${cvData.contact.phone ? `<p>📞 ${cvData.contact.phone}</p>` : ''}
+                ${cvData.contact.linkedin ? `<p>💼 ${cvData.contact.linkedin}</p>` : ''}
+              </div>
+            </section>
           ` : ''}
-          ${cvData.summary ? `<section class="creatif-section"><h2>À Propos</h2><p>${cvData.summary}</p></section>` : ''}
-          ${cvData.experience ? `<section class="creatif-section"><h2>Expérience</h2>${renderArray(cvData.experience, 'experience')}</section>` : ''}
-          ${cvData.education ? `<section class="creatif-section"><h2>Formation</h2>${renderArray(cvData.education, 'education')}</section>` : ''}
-          ${cvData.skills ? `<section class="creatif-section"><h2>Compétences</h2>${renderSkills(cvData.skills)}</section>` : ''}
-        </div>
+          ${cvData.skills ? `<section><h2>Compétences</h2>${renderSkills(cvData.skills)}</section>` : ''}
+        </aside>
+        <main class="creatif-main">
+          ${cvData.summary ? `<section><h2>À Propos</h2><p>${cvData.summary}</p></section>` : ''}
+          ${cvData.experience ? `<section><h2>Expérience</h2>${renderArray(cvData.experience, 'experience')}</section>` : ''}
+          ${cvData.education ? `<section><h2>Formation</h2>${renderArray(cvData.education, 'education')}</section>` : ''}
+        </main>
       `;
     } else if (template === 'tech') {
       bodyContent = `
@@ -500,60 +571,47 @@ serve(async (req) => {
               ` : ''}
             </div>
           </div>
-          ${cvData.summary ? `<section class="tech-section"><h2>README.md</h2><p>${cvData.summary}</p></section>` : ''}
-          ${cvData.experience ? `<section class="tech-section"><h2>work_experience/</h2>${renderArray(cvData.experience, 'experience')}</section>` : ''}
-          ${cvData.education ? `<section class="tech-section"><h2>education/</h2>${renderArray(cvData.education, 'education')}</section>` : ''}
-          ${cvData.skills ? `<section class="tech-section"><h2>skills: [</h2>${renderSkills(cvData.skills)}<p>]</p></section>` : ''}
+          ${cvData.summary ? `<section><h2>Profil</h2><p>${cvData.summary}</p></section>` : ''}
+          ${cvData.experience ? `<section><h2>Expérience</h2>${renderArray(cvData.experience, 'experience')}</section>` : ''}
+          ${cvData.education ? `<section><h2>Formation</h2>${renderArray(cvData.education, 'education')}</section>` : ''}
+          ${cvData.skills ? `<section><h2>Compétences</h2>${renderSkills(cvData.skills)}</section>` : ''}
         </div>
       `;
-    } else {
-      // Default to moderne
-      bodyContent = `<h1>${cvData.name || 'Votre Nom'}</h1><p>${cvData.title || ''}</p>`;
     }
 
-    const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>${getTemplateStyles(template)}</style>
-</head>
-<body>
-  ${bodyContent}
-</body>
-</html>
-    `;
-
     if (format === 'pdf') {
-      // For MVP, return HTML content that can be printed as PDF by browser
-      // In production, use puppeteer or similar
-      return new Response(
-        htmlContent,
-        { 
-          headers: { 
-            ...corsHeaders, 
-            'Content-Type': 'text/html',
-            'Content-Disposition': 'attachment; filename="cv.html"'
-          },
-          status: 200 
-        }
-      );
-    } else {
-      // DOCX generation would require a library like docx
-      // For MVP, return error or HTML
+      const html = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>${getTemplateStyles(template || 'moderne')}</style>
+          </head>
+          <body>
+            <div class="cv-preview-content">
+              ${bodyContent}
+            </div>
+          </body>
+        </html>
+      `;
+
+      return new Response(html, {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'text/html',
+          'Content-Disposition': 'attachment; filename="cv.html"',
+        },
+      });
+    } else if (format === 'docx') {
       throw new Error('DOCX export not yet implemented');
     }
 
-  } catch (error) {
-    console.error('Error in export-cv:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: (error as Error).message || 'Internal server error' 
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
-      }
-    );
+    throw new Error('Invalid format');
+  } catch (error: any) {
+    console.error('Export error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });

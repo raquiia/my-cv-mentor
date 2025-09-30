@@ -535,10 +535,10 @@ export default function CVEditor() {
                     </div>
                   )}
 
-                  {/* Template Créatif - avec fonds colorés */}
+                  {/* Template Créatif - avec sidebar verte */}
                   {selectedTemplate === "creatif" && (
-                    <div className="creatif-layout">
-                      <div className="creatif-header">
+                    <>
+                      <aside className="creatif-sidebar">
                         {profilePhotoUrl ? (
                           <img src={profilePhotoUrl} alt="Photo" className="creatif-photo" />
                         ) : (
@@ -546,78 +546,81 @@ export default function CVEditor() {
                             <span>📷</span>
                           </div>
                         )}
-                        <div>
-                          <h1>{cvData.name || "Votre Nom"}</h1>
-                          <p className="title-text">{cvData.title || "Titre Professionnel"}</p>
-                        </div>
-                      </div>
-                      
-                      {cvData.contact && (
-                        <div className="creatif-contact">
-                          {cvData.contact.email && <span>✉ {cvData.contact.email}</span>}
-                          {cvData.contact.phone && <span>📞 {cvData.contact.phone}</span>}
-                          {cvData.contact.linkedin && <span>💼 {cvData.contact.linkedin}</span>}
-                        </div>
-                      )}
-                      
-                      {cvData.summary && (
-                        <section className="creatif-section">
-                          <h2>À Propos</h2>
-                          <p>{cvData.summary}</p>
-                        </section>
-                      )}
-
-                      {cvData.experience && (
-                        <section className="creatif-section">
-                          <h2>Expérience</h2>
-                          {Array.isArray(cvData.experience) ? (
-                            cvData.experience.map((exp: any, idx: number) => (
-                              <div key={idx} className="entry">
-                                <h3>{exp.title}</h3>
-                                <p className="meta">{exp.company} • {exp.years}</p>
-                                <p>{exp.description}</p>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="whitespace-pre-wrap">{cvData.experience}</div>
-                          )}
-                        </section>
-                      )}
-
-                      {cvData.education && (
-                        <section className="creatif-section">
-                          <h2>Formation</h2>
-                          {Array.isArray(cvData.education) ? (
-                            cvData.education.map((edu: any, idx: number) => (
-                              <div key={idx} className="entry">
-                                <h3>{edu.degree}</h3>
-                                <p className="meta">{edu.university} • {edu.years}</p>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="whitespace-pre-wrap">{cvData.education}</div>
-                          )}
-                        </section>
-                      )}
-
-                      {cvData.skills && (
-                        <section className="creatif-section">
-                          <h2>Compétences</h2>
-                          {Array.isArray(cvData.skills) ? (
-                            <div className="skills-creative">
-                              {cvData.skills.map((skill: string, idx: number) => (
-                                <span key={idx} className="skill-creative">{skill}</span>
-                              ))}
+                        <h1>{cvData.name || "Votre Nom"}</h1>
+                        <p className="title-text">{cvData.title || "Titre Professionnel"}</p>
+                        
+                        {cvData.contact && (
+                          <section>
+                            <h2>Contact</h2>
+                            <div className="contact-list">
+                              {cvData.contact.email && <p>✉ {cvData.contact.email}</p>}
+                              {cvData.contact.phone && <p>📞 {cvData.contact.phone}</p>}
+                              {cvData.contact.linkedin && <p>💼 {cvData.contact.linkedin}</p>}
                             </div>
-                          ) : (
-                            <div className="whitespace-pre-wrap">{cvData.skills}</div>
-                          )}
-                        </section>
-                      )}
-                    </div>
+                          </section>
+                        )}
+                        
+                        {cvData.skills && (
+                          <section>
+                            <h2>Compétences</h2>
+                            {Array.isArray(cvData.skills) ? (
+                              <ul>
+                                {cvData.skills.map((skill: string, idx: number) => (
+                                  <li key={idx}>{skill}</li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <div className="whitespace-pre-wrap">{cvData.skills}</div>
+                            )}
+                          </section>
+                        )}
+                      </aside>
+                      
+                      <main className="creatif-main">
+                        {cvData.summary && (
+                          <section>
+                            <h2>À Propos</h2>
+                            <p>{cvData.summary}</p>
+                          </section>
+                        )}
+
+                        {cvData.experience && (
+                          <section>
+                            <h2>Expérience</h2>
+                            {Array.isArray(cvData.experience) ? (
+                              cvData.experience.map((exp: any, idx: number) => (
+                                <div key={idx} className="entry">
+                                  <h3>{exp.title}</h3>
+                                  <p className="meta">{exp.company} • {exp.years}</p>
+                                  <p>{exp.description}</p>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="whitespace-pre-wrap">{cvData.experience}</div>
+                            )}
+                          </section>
+                        )}
+
+                        {cvData.education && (
+                          <section>
+                            <h2>Formation</h2>
+                            {Array.isArray(cvData.education) ? (
+                              cvData.education.map((edu: any, idx: number) => (
+                                <div key={idx} className="entry">
+                                  <h3>{edu.degree}</h3>
+                                  <p className="meta">{edu.university} • {edu.years}</p>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="whitespace-pre-wrap">{cvData.education}</div>
+                            )}
+                          </section>
+                        )}
+                      </main>
+                    </>
                   )}
 
-                  {/* Template Tech - style développeur */}
+                  {/* Template Tech - avec triangle violet */}
                   {selectedTemplate === "tech" && (
                     <div className="tech-layout">
                       <div className="tech-header">
@@ -625,7 +628,7 @@ export default function CVEditor() {
                           <img src={profilePhotoUrl} alt="Photo" className="tech-photo" />
                         ) : (
                           <div className="tech-photo-placeholder">
-                            <span>{"<img/>"}</span>
+                            <span>IMG</span>
                           </div>
                         )}
                         <div>
@@ -642,20 +645,20 @@ export default function CVEditor() {
                       </div>
                       
                       {cvData.summary && (
-                        <section className="tech-section">
-                          <h2>README.md</h2>
+                        <section>
+                          <h2>Profil</h2>
                           <p>{cvData.summary}</p>
                         </section>
                       )}
 
                       {cvData.experience && (
-                        <section className="tech-section">
-                          <h2>work_experience/</h2>
+                        <section>
+                          <h2>Expérience</h2>
                           {Array.isArray(cvData.experience) ? (
                             cvData.experience.map((exp: any, idx: number) => (
-                              <div key={idx} className="entry tech-entry">
+                              <div key={idx} className="tech-entry">
                                 <h3>{exp.title}</h3>
-                                <p className="meta">// {exp.company} | {exp.years}</p>
+                                <p className="meta">{exp.company} • {exp.years}</p>
                                 <p>{exp.description}</p>
                               </div>
                             ))
@@ -666,13 +669,13 @@ export default function CVEditor() {
                       )}
 
                       {cvData.education && (
-                        <section className="tech-section">
-                          <h2>education/</h2>
+                        <section>
+                          <h2>Formation</h2>
                           {Array.isArray(cvData.education) ? (
                             cvData.education.map((edu: any, idx: number) => (
-                              <div key={idx} className="entry tech-entry">
+                              <div key={idx} className="tech-entry">
                                 <h3>{edu.degree}</h3>
-                                <p className="meta">// {edu.university} | {edu.years}</p>
+                                <p className="meta">{edu.university} • {edu.years}</p>
                               </div>
                             ))
                           ) : (
@@ -682,18 +685,17 @@ export default function CVEditor() {
                       )}
 
                       {cvData.skills && (
-                        <section className="tech-section">
-                          <h2>skills: [</h2>
+                        <section>
+                          <h2>Compétences</h2>
                           {Array.isArray(cvData.skills) ? (
                             <div className="tech-skills">
                               {cvData.skills.map((skill: string, idx: number) => (
-                                <code key={idx} className="tech-skill">"{skill}",</code>
+                                <span key={idx} className="tech-skill">{skill}</span>
                               ))}
                             </div>
                           ) : (
                             <div className="whitespace-pre-wrap">{cvData.skills}</div>
                           )}
-                          <p className="tech-close">]</p>
                         </section>
                       )}
                     </div>
