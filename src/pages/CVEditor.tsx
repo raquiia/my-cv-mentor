@@ -25,7 +25,9 @@ export default function CVEditor() {
   const [isImproving, setIsImproving] = useState(false);
   const [credits, setCredits] = useState(0);
   const [originalPreviewUrl, setOriginalPreviewUrl] = useState<string | null>(null);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const [extractionWarning, setExtractionWarning] = useState<string | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(0.85);
 
   // Load user credits
   useEffect(() => {
@@ -57,6 +59,7 @@ export default function CVEditor() {
     setIsAnalyzing(true);
     setExtractionWarning(null);
     setOriginalPreviewUrl(null);
+    setProfilePhotoUrl(null);
     
     try {
       let extractedText = '';
@@ -67,9 +70,9 @@ export default function CVEditor() {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         
-        // Generate thumbnail from first page
+        // Generate high-resolution thumbnail from first page for photo extraction
         const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 1.5 });
+        const viewport = page.getViewport({ scale: 2.5 }); // Higher resolution for better photo detection
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
@@ -82,7 +85,26 @@ export default function CVEditor() {
             canvas: canvas,
           };
           await page.render(renderContext).promise;
-          setOriginalPreviewUrl(canvas.toDataURL());
+          const highResImage = canvas.toDataURL('image/jpeg', 0.95);
+          setOriginalPreviewUrl(highResImage);
+          
+          // Extract profile photo using AI vision
+          try {
+            const { data: photoData, error: photoError } = await supabase.functions.invoke('extract-photo', {
+              body: { imageDataUrl: highResImage }
+            });
+            
+            if (!photoError && photoData?.hasPhoto) {
+              console.log('Profile photo detected:', photoData.description);
+              // For now, use the full page as photo - in future, could crop to detected region
+              setProfilePhotoUrl(highResImage);
+            } else {
+              console.log('No profile photo detected');
+            }
+          } catch (photoError) {
+            console.warn('Photo extraction failed:', photoError);
+            // Continue without photo
+          }
         }
         
         // Extract text from all pages
@@ -306,15 +328,47 @@ export default function CVEditor() {
               </div>
             </div>
             
-            <div className={`border rounded-lg bg-white min-h-[800px] shadow-lg cv-preview-wrapper cv-template-${selectedTemplate}`}>
-              {cvData ? (
-                <div className="cv-preview-content">
+            {/* A4 Preview Container */}
+            <div className="flex flex-col items-center gap-4">
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-2">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => setZoomLevel(z => Math.max(0.5, z - 0.1))}
+                >
+                  -
+                </Button>
+                <span className="text-sm text-muted-foreground min-w-[60px] text-center">
+                  {Math.round(zoomLevel * 100)}%
+                </span>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => setZoomLevel(z => Math.min(1.5, z + 0.1))}
+                >
+                  +
+                </Button>
+              </div>
+
+              {/* A4 Page */}
+              <div 
+                className="cv-page-a4 shadow-xl"
+                style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top center' }}
+              >
+                <div className={`cv-template-${selectedTemplate} h-full`}>
+                  {cvData ? (
+                    <div className="cv-preview-content">
                   {/* Template Moderne - 1 colonne avec header */}
                   {selectedTemplate === "moderne" && (
                     <div className="moderne-layout">
                       <div className="moderne-header">
-                        {originalPreviewUrl && (
-                          <img src={originalPreviewUrl} alt="Photo" className="moderne-photo" />
+                        {profilePhotoUrl ? (
+                          <img src={profilePhotoUrl} alt="Photo" className="moderne-photo" />
+                        ) : (
+                          <div className="moderne-photo-placeholder">
+                            <span>Photo</span>
+                          </div>
                         )}
                         <div className="moderne-header-text">
                           <h1>{cvData.name || "Votre Nom"}</h1>
@@ -390,8 +444,12 @@ export default function CVEditor() {
                   {selectedTemplate === "classique" && (
                     <div className="classique-layout">
                       <div className="classique-header">
-                        {originalPreviewUrl && (
-                          <img src={originalPreviewUrl} alt="Photo" className="classique-photo" />
+                        {profilePhotoUrl ? (
+                          <img src={profilePhotoUrl} alt="Photo" className="classique-photo" />
+                        ) : (
+                          <div className="classique-photo-placeholder">
+                            <span>Photo</span>
+                          </div>
                         )}
                         <h1>{cvData.name || "Votre Nom"}</h1>
                         <p className="title-text">{cvData.title || "Titre Professionnel"}</p>
@@ -482,8 +540,12 @@ export default function CVEditor() {
                   {selectedTemplate === "creatif" && (
                     <div className="creatif-layout">
                       <div className="creatif-header">
-                        {originalPreviewUrl && (
-                          <img src={originalPreviewUrl} alt="Photo" className="creatif-photo" />
+                        {profilePhotoUrl ? (
+                          <img src={profilePhotoUrl} alt="Photo" className="creatif-photo" />
+                        ) : (
+                          <div className="creatif-photo-placeholder">
+                            <span>📷</span>
+                          </div>
                         )}
                         <div>
                           <h1>{cvData.name || "Votre Nom"}</h1>
@@ -560,8 +622,12 @@ export default function CVEditor() {
                   {selectedTemplate === "tech" && (
                     <div className="tech-layout">
                       <div className="tech-header">
-                        {originalPreviewUrl && (
-                          <img src={originalPreviewUrl} alt="Photo" className="tech-photo" />
+                        {profilePhotoUrl ? (
+                          <img src={profilePhotoUrl} alt="Photo" className="tech-photo" />
+                        ) : (
+                          <div className="tech-photo-placeholder">
+                            <span>{"<img/>"}</span>
+                          </div>
                         )}
                         <div>
                           <h1>{cvData.name || "Votre Nom"}</h1>
@@ -633,16 +699,18 @@ export default function CVEditor() {
                       )}
                     </div>
                   )}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-center">
+                      <Eye className="h-16 w-16 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">Aucun CV chargé</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Uploadez un CV pour commencer
+                      </p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <Eye className="h-16 w-16 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucun CV chargé</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Uploadez un CV pour commencer
-                  </p>
-                </div>
-              )}
+              </div>
             </div>
           </Card>
 

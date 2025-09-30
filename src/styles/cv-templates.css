@@ -1,13 +1,21 @@
-/* CV Template Styles - Advanced Layouts */
+/* CV Template Styles - Advanced Layouts with A4 Format */
 
-/* Common wrapper styles */
-.cv-preview-wrapper {
+/* A4 Page Container - Realistic document format */
+.cv-page-a4 {
+  width: 794px;  /* A4 width at 96 DPI */
+  height: 1123px; /* A4 height at 96 DPI */
+  background: white;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  margin: 0 auto;
   overflow: hidden;
+  position: relative;
 }
 
 .cv-preview-content {
-  padding: 2rem;
-  min-height: 800px;
+  padding: 2.5rem;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .cv-preview-content section {
@@ -49,6 +57,20 @@
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid hsl(var(--primary));
+  flex-shrink: 0;
+}
+
+.moderne-photo-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.1));
+  border: 3px dashed hsl(var(--primary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: hsl(var(--primary));
   flex-shrink: 0;
 }
 
@@ -133,6 +155,20 @@
   display: block;
 }
 
+.classique-photo-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  border: 3px dashed #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 auto 1rem;
+}
+
 .cv-template-classique h1 {
   color: hsl(var(--foreground));
   font-size: 2.25rem;
@@ -213,7 +249,11 @@
 /* ========== CRÉATIF TEMPLATE ========== */
 .cv-template-creatif {
   font-family: 'Poppins', 'Helvetica Neue', sans-serif;
+}
+
+.cv-template-creatif .cv-preview-content {
   background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  padding: 2rem;
 }
 
 .creatif-layout {
@@ -240,6 +280,20 @@
   border: 4px solid white;
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.creatif-photo-placeholder {
+  width: 100px;
+  height: 100px;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.3);
+  border: 4px dashed white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .cv-template-creatif h1 {
@@ -307,8 +361,12 @@
 /* ========== TECH TEMPLATE ========== */
 .cv-template-tech {
   font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+}
+
+.cv-template-tech .cv-preview-content {
   background: #0d1117;
   color: #c9d1d9;
+  padding: 1.5rem;
 }
 
 .tech-layout {
@@ -333,6 +391,20 @@
   border-radius: 0.5rem;
   object-fit: cover;
   border: 2px solid hsl(142, 76%, 36%);
+  flex-shrink: 0;
+}
+
+.tech-photo-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 0.5rem;
+  background: #161b22;
+  border: 2px dashed hsl(142, 76%, 36%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: hsl(142, 76%, 36%);
   flex-shrink: 0;
 }
 

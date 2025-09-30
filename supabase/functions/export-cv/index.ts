@@ -22,12 +22,25 @@ serve(async (req) => {
     // Generate HTML content based on template
     const getTemplateStyles = (templateId: string) => {
       const baseStyles = `
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @page { 
+          size: A4;
+          margin: 0;
+        }
+        * { 
+          margin: 0; 
+          padding: 0; 
+          box-sizing: border-box; 
+        }
+        html, body {
+          width: 210mm;
+          height: 297mm;
+          margin: 0;
+          padding: 0;
+        }
         body { 
           line-height: 1.6;
           padding: 40px;
-          max-width: 210mm;
-          margin: 0 auto;
+          font-size: 11pt;
         }
         section { margin-bottom: 1.5rem; }
         .entry { margin-bottom: 1.25rem; }
@@ -139,7 +152,7 @@ serve(async (req) => {
           }
           .classique-grid {
             display: grid;
-            grid-template-columns: 200px 1fr;
+            grid-template-columns: 180px 1fr;
             gap: 2rem;
           }
           .classique-sidebar { 
@@ -165,7 +178,7 @@ serve(async (req) => {
             left: 0;
           }
           h2 {
-            font-size: 1.35rem;
+            font-size: 1.2rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -175,7 +188,7 @@ serve(async (req) => {
             margin-bottom: 0.75rem;
           }
           h3 { 
-            font-size: 1.15rem; 
+            font-size: 1.1rem; 
             font-weight: 600; 
             font-style: italic;
           }
@@ -185,6 +198,7 @@ serve(async (req) => {
             font-family: 'Poppins', 'Arial', sans-serif;
             color: #1a1a1a;
             background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            padding: 2rem;
           }
           .creatif-header {
             background: linear-gradient(135deg, #2563eb, #7c3aed);
@@ -266,6 +280,7 @@ serve(async (req) => {
             font-family: 'Courier New', monospace;
             color: #c9d1d9;
             background: #0d1117;
+            padding: 1.5rem;
           }
           .tech-header {
             background: #161b22;
@@ -324,7 +339,7 @@ serve(async (req) => {
             font-size: 1.1rem; 
             font-weight: 600;
           }
-          h3::before { content: '### '; color: #86efac; }
+          h3::before { content: '### '; color: #86efac; font-size: 0.9rem; }
           .tech-entry {
             padding: 1rem;
             background: #0d1117;

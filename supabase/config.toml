@@ -3,6 +3,9 @@ project_id = "oeaxjzgxmseglxgbxrzk"
 [functions.parse-cv]
 verify_jwt = true
 
+[functions.extract-photo]
+verify_jwt = true
+
 [functions.improve-section]
 verify_jwt = true
 
