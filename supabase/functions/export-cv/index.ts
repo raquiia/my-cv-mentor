@@ -39,8 +39,13 @@ serve(async (req) => {
         }
         body { 
           line-height: 1.6;
-          padding: 40px;
           font-size: 11pt;
+        }
+        .cv-preview-content {
+          padding: 2.5rem;
+          height: 100%;
+          overflow: hidden;
+          box-sizing: border-box;
         }
         section { margin-bottom: 1.5rem; }
         .entry { margin-bottom: 1.25rem; }
@@ -123,7 +128,10 @@ serve(async (req) => {
           body { 
             font-family: Georgia, 'Times New Roman', serif;
             color: #1a1a1a;
-            background: #ffffff;
+            background: #f8f9fa;
+          }
+          .cv-preview-content {
+            background: transparent;
           }
           .classique-header { 
             text-align: center; 
@@ -196,9 +204,12 @@ serve(async (req) => {
         creatif: baseStyles + `
           body { 
             font-family: 'Poppins', 'Arial', sans-serif;
-            color: #1a1a1a;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-            padding: 2rem;
+            color: white;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+          }
+          .cv-preview-content {
+            padding: 2.5rem;
+            background: transparent;
           }
           .creatif-header {
             background: linear-gradient(135deg, #2563eb, #7c3aed);
@@ -280,7 +291,10 @@ serve(async (req) => {
             font-family: 'Courier New', monospace;
             color: #c9d1d9;
             background: #0d1117;
-            padding: 1.5rem;
+          }
+          .cv-preview-content {
+            padding: 2.5rem;
+            background: transparent;
           }
           .tech-header {
             background: #161b22;

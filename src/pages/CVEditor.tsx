@@ -353,10 +353,9 @@ export default function CVEditor() {
 
               {/* A4 Page */}
               <div 
-                className="cv-page-a4 shadow-xl"
+                className={`cv-page-a4 cv-template-${selectedTemplate} shadow-xl`}
                 style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top center' }}
               >
-                <div className={`cv-template-${selectedTemplate} h-full`}>
                   {cvData ? (
                     <div className="cv-preview-content">
                   {/* Template Moderne - 1 colonne avec header */}
@@ -699,17 +698,16 @@ export default function CVEditor() {
                       )}
                     </div>
                   )}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-center">
-                      <Eye className="h-16 w-16 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">Aucun CV chargé</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Uploadez un CV pour commencer
-                      </p>
-                    </div>
-                  )}
                 </div>
+              ) : (
+                <div className="cv-preview-content flex flex-col items-center justify-center h-full text-center">
+                  <Eye className="h-16 w-16 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Aucun CV chargé</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Uploadez un CV pour commencer
+                  </p>
+                </div>
+              )}
               </div>
             </div>
           </Card>

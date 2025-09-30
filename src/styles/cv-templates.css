@@ -4,17 +4,17 @@
 .cv-page-a4 {
   width: 794px;  /* A4 width at 96 DPI */
   height: 1123px; /* A4 height at 96 DPI */
-  background: white;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   margin: 0 auto;
   overflow: hidden;
   position: relative;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  page-break-after: always;
 }
 
 .cv-preview-content {
   padding: 2.5rem;
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -35,6 +35,7 @@
 /* ========== MODERNE TEMPLATE ========== */
 .cv-template-moderne {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: white;
 }
 
 .moderne-layout {
@@ -131,6 +132,7 @@
 /* ========== CLASSIQUE TEMPLATE ========== */
 .cv-template-classique {
   font-family: 'Georgia', 'Times New Roman', serif;
+  background: #f8f9fa;
 }
 
 .classique-layout {
@@ -249,11 +251,11 @@
 /* ========== CRÉATIF TEMPLATE ========== */
 .cv-template-creatif {
   font-family: 'Poppins', 'Helvetica Neue', sans-serif;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
 .cv-template-creatif .cv-preview-content {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
-  padding: 2rem;
+  background: transparent;
 }
 
 .creatif-layout {
@@ -361,12 +363,12 @@
 /* ========== TECH TEMPLATE ========== */
 .cv-template-tech {
   font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  background: #0d1117;
+  color: #c9d1d9;
 }
 
 .cv-template-tech .cv-preview-content {
-  background: #0d1117;
-  color: #c9d1d9;
-  padding: 1.5rem;
+  background: transparent;
 }
 
 .tech-layout {
