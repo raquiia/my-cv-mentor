@@ -306,74 +306,331 @@ export default function CVEditor() {
               </div>
             </div>
             
-            <div className={`border rounded-lg bg-white min-h-[800px] shadow-lg cv-preview-content cv-template-${selectedTemplate}`}>
+            <div className={`border rounded-lg bg-white min-h-[800px] shadow-lg cv-preview-wrapper cv-template-${selectedTemplate}`}>
               {cvData ? (
-                <div className="space-y-6">
-                  <div>
-                    <h1>{cvData.name || "Votre Nom"}</h1>
-                    <p className="text-muted-foreground">{cvData.title || "Titre Professionnel"}</p>
-                  </div>
-                  
-                  {cvData.summary && (
-                    <div>
-                      <h2>Résumé</h2>
-                      <p>{cvData.summary}</p>
-                    </div>
-                  )}
-
-                  {cvData.experience && (
-                    <div>
-                      <h2>Expérience</h2>
-                      <div className="space-y-3">
-                        {Array.isArray(cvData.experience) ? (
-                          cvData.experience.map((exp: any, idx: number) => (
-                            <div key={idx} className="mb-3">
-                              <h3>{exp.title}</h3>
-                              <p className="text-sm text-muted-foreground">{exp.company} • {exp.years}</p>
-                              <p className="mt-1">{exp.description}</p>
+                <div className="cv-preview-content">
+                  {/* Template Moderne - 1 colonne avec header */}
+                  {selectedTemplate === "moderne" && (
+                    <div className="moderne-layout">
+                      <div className="moderne-header">
+                        {originalPreviewUrl && (
+                          <img src={originalPreviewUrl} alt="Photo" className="moderne-photo" />
+                        )}
+                        <div className="moderne-header-text">
+                          <h1>{cvData.name || "Votre Nom"}</h1>
+                          <p className="title-text">{cvData.title || "Titre Professionnel"}</p>
+                          {cvData.contact && (
+                            <div className="contact-info">
+                              {cvData.contact.email && <span>{cvData.contact.email}</span>}
+                              {cvData.contact.phone && <span>{cvData.contact.phone}</span>}
+                              {cvData.contact.linkedin && <span>{cvData.contact.linkedin}</span>}
                             </div>
-                          ))
-                        ) : (
-                          <div className="whitespace-pre-wrap">{cvData.experience}</div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                      
+                      {cvData.summary && (
+                        <section>
+                          <h2>Résumé</h2>
+                          <p>{cvData.summary}</p>
+                        </section>
+                      )}
 
-                  {cvData.education && (
-                    <div>
-                      <h2>Formation</h2>
-                      <div className="space-y-3">
-                        {Array.isArray(cvData.education) ? (
-                          cvData.education.map((edu: any, idx: number) => (
-                            <div key={idx} className="mb-3">
-                              <h3>{edu.degree}</h3>
-                              <p className="text-sm text-muted-foreground">{edu.university} • {edu.years}</p>
+                      {cvData.experience && (
+                        <section>
+                          <h2>Expérience</h2>
+                          {Array.isArray(cvData.experience) ? (
+                            cvData.experience.map((exp: any, idx: number) => (
+                              <div key={idx} className="entry">
+                                <h3>{exp.title}</h3>
+                                <p className="meta">{exp.company} • {exp.years}</p>
+                                <p>{exp.description}</p>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="whitespace-pre-wrap">{cvData.experience}</div>
+                          )}
+                        </section>
+                      )}
+
+                      {cvData.education && (
+                        <section>
+                          <h2>Formation</h2>
+                          {Array.isArray(cvData.education) ? (
+                            cvData.education.map((edu: any, idx: number) => (
+                              <div key={idx} className="entry">
+                                <h3>{edu.degree}</h3>
+                                <p className="meta">{edu.university} • {edu.years}</p>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="whitespace-pre-wrap">{cvData.education}</div>
+                          )}
+                        </section>
+                      )}
+
+                      {cvData.skills && (
+                        <section>
+                          <h2>Compétences</h2>
+                          {Array.isArray(cvData.skills) ? (
+                            <div className="skills-grid">
+                              {cvData.skills.map((skill: string, idx: number) => (
+                                <span key={idx} className="skill-tag">{skill}</span>
+                              ))}
                             </div>
-                          ))
-                        ) : (
-                          <div className="whitespace-pre-wrap">{cvData.education}</div>
+                          ) : (
+                            <div className="whitespace-pre-wrap">{cvData.skills}</div>
+                          )}
+                        </section>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Template Classique - 2 colonnes */}
+                  {selectedTemplate === "classique" && (
+                    <div className="classique-layout">
+                      <div className="classique-header">
+                        {originalPreviewUrl && (
+                          <img src={originalPreviewUrl} alt="Photo" className="classique-photo" />
                         )}
+                        <h1>{cvData.name || "Votre Nom"}</h1>
+                        <p className="title-text">{cvData.title || "Titre Professionnel"}</p>
+                      </div>
+                      
+                      <div className="classique-grid">
+                        <aside className="classique-sidebar">
+                          {cvData.contact && (
+                            <section>
+                              <h2>Contact</h2>
+                              <div className="contact-list">
+                                {cvData.contact.email && <p>{cvData.contact.email}</p>}
+                                {cvData.contact.phone && <p>{cvData.contact.phone}</p>}
+                                {cvData.contact.linkedin && <p>{cvData.contact.linkedin}</p>}
+                              </div>
+                            </section>
+                          )}
+                          
+                          {cvData.skills && (
+                            <section>
+                              <h2>Compétences</h2>
+                              {Array.isArray(cvData.skills) ? (
+                                <ul>
+                                  {cvData.skills.map((skill: string, idx: number) => (
+                                    <li key={idx}>{skill}</li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <div className="whitespace-pre-wrap">{cvData.skills}</div>
+                              )}
+                            </section>
+                          )}
+                          
+                          {cvData.languages && (
+                            <section>
+                              <h2>Langues</h2>
+                              <p>{cvData.languages}</p>
+                            </section>
+                          )}
+                        </aside>
+                        
+                        <main className="classique-main">
+                          {cvData.summary && (
+                            <section>
+                              <h2>Profil</h2>
+                              <p>{cvData.summary}</p>
+                            </section>
+                          )}
+
+                          {cvData.experience && (
+                            <section>
+                              <h2>Expérience Professionnelle</h2>
+                              {Array.isArray(cvData.experience) ? (
+                                cvData.experience.map((exp: any, idx: number) => (
+                                  <div key={idx} className="entry">
+                                    <h3>{exp.title}</h3>
+                                    <p className="meta">{exp.company} • {exp.years}</p>
+                                    <p>{exp.description}</p>
+                                  </div>
+                                ))
+                              ) : (
+                                <div className="whitespace-pre-wrap">{cvData.experience}</div>
+                              )}
+                            </section>
+                          )}
+
+                          {cvData.education && (
+                            <section>
+                              <h2>Formation</h2>
+                              {Array.isArray(cvData.education) ? (
+                                cvData.education.map((edu: any, idx: number) => (
+                                  <div key={idx} className="entry">
+                                    <h3>{edu.degree}</h3>
+                                    <p className="meta">{edu.university} • {edu.years}</p>
+                                  </div>
+                                ))
+                              ) : (
+                                <div className="whitespace-pre-wrap">{cvData.education}</div>
+                              )}
+                            </section>
+                          )}
+                        </main>
                       </div>
                     </div>
                   )}
 
-                  {cvData.skills && (
-                    <div>
-                      <h2>Compétences</h2>
-                      <div>
-                        {Array.isArray(cvData.skills) ? (
-                          <div className="flex flex-wrap gap-2">
-                            {cvData.skills.map((skill: string, idx: number) => (
-                              <span key={idx} className="px-3 py-1 bg-secondary rounded-full text-sm">
-                                {skill}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="whitespace-pre-wrap">{cvData.skills}</div>
+                  {/* Template Créatif - avec fonds colorés */}
+                  {selectedTemplate === "creatif" && (
+                    <div className="creatif-layout">
+                      <div className="creatif-header">
+                        {originalPreviewUrl && (
+                          <img src={originalPreviewUrl} alt="Photo" className="creatif-photo" />
                         )}
+                        <div>
+                          <h1>{cvData.name || "Votre Nom"}</h1>
+                          <p className="title-text">{cvData.title || "Titre Professionnel"}</p>
+                        </div>
                       </div>
+                      
+                      {cvData.contact && (
+                        <div className="creatif-contact">
+                          {cvData.contact.email && <span>✉ {cvData.contact.email}</span>}
+                          {cvData.contact.phone && <span>📞 {cvData.contact.phone}</span>}
+                          {cvData.contact.linkedin && <span>💼 {cvData.contact.linkedin}</span>}
+                        </div>
+                      )}
+                      
+                      {cvData.summary && (
+                        <section className="creatif-section">
+                          <h2>À Propos</h2>
+                          <p>{cvData.summary}</p>
+                        </section>
+                      )}
+
+                      {cvData.experience && (
+                        <section className="creatif-section">
+                          <h2>Expérience</h2>
+                          {Array.isArray(cvData.experience) ? (
+                            cvData.experience.map((exp: any, idx: number) => (
+                              <div key={idx} className="entry">
+                                <h3>{exp.title}</h3>
+                                <p className="meta">{exp.company} • {exp.years}</p>
+                                <p>{exp.description}</p>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="whitespace-pre-wrap">{cvData.experience}</div>
+                          )}
+                        </section>
+                      )}
+
+                      {cvData.education && (
+                        <section className="creatif-section">
+                          <h2>Formation</h2>
+                          {Array.isArray(cvData.education) ? (
+                            cvData.education.map((edu: any, idx: number) => (
+                              <div key={idx} className="entry">
+                                <h3>{edu.degree}</h3>
+                                <p className="meta">{edu.university} • {edu.years}</p>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="whitespace-pre-wrap">{cvData.education}</div>
+                          )}
+                        </section>
+                      )}
+
+                      {cvData.skills && (
+                        <section className="creatif-section">
+                          <h2>Compétences</h2>
+                          {Array.isArray(cvData.skills) ? (
+                            <div className="skills-creative">
+                              {cvData.skills.map((skill: string, idx: number) => (
+                                <span key={idx} className="skill-creative">{skill}</span>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="whitespace-pre-wrap">{cvData.skills}</div>
+                          )}
+                        </section>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Template Tech - style développeur */}
+                  {selectedTemplate === "tech" && (
+                    <div className="tech-layout">
+                      <div className="tech-header">
+                        {originalPreviewUrl && (
+                          <img src={originalPreviewUrl} alt="Photo" className="tech-photo" />
+                        )}
+                        <div>
+                          <h1>{cvData.name || "Votre Nom"}</h1>
+                          <p className="title-text">{cvData.title || "Titre Professionnel"}</p>
+                          {cvData.contact && (
+                            <div className="tech-contact">
+                              {cvData.contact.email && <code>{cvData.contact.email}</code>}
+                              {cvData.contact.phone && <code>{cvData.contact.phone}</code>}
+                              {cvData.contact.linkedin && <code>{cvData.contact.linkedin}</code>}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {cvData.summary && (
+                        <section className="tech-section">
+                          <h2>README.md</h2>
+                          <p>{cvData.summary}</p>
+                        </section>
+                      )}
+
+                      {cvData.experience && (
+                        <section className="tech-section">
+                          <h2>work_experience/</h2>
+                          {Array.isArray(cvData.experience) ? (
+                            cvData.experience.map((exp: any, idx: number) => (
+                              <div key={idx} className="entry tech-entry">
+                                <h3>{exp.title}</h3>
+                                <p className="meta">// {exp.company} | {exp.years}</p>
+                                <p>{exp.description}</p>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="whitespace-pre-wrap">{cvData.experience}</div>
+                          )}
+                        </section>
+                      )}
+
+                      {cvData.education && (
+                        <section className="tech-section">
+                          <h2>education/</h2>
+                          {Array.isArray(cvData.education) ? (
+                            cvData.education.map((edu: any, idx: number) => (
+                              <div key={idx} className="entry tech-entry">
+                                <h3>{edu.degree}</h3>
+                                <p className="meta">// {edu.university} | {edu.years}</p>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="whitespace-pre-wrap">{cvData.education}</div>
+                          )}
+                        </section>
+                      )}
+
+                      {cvData.skills && (
+                        <section className="tech-section">
+                          <h2>skills: [</h2>
+                          {Array.isArray(cvData.skills) ? (
+                            <div className="tech-skills">
+                              {cvData.skills.map((skill: string, idx: number) => (
+                                <code key={idx} className="tech-skill">"{skill}",</code>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="whitespace-pre-wrap">{cvData.skills}</div>
+                          )}
+                          <p className="tech-close">]</p>
+                        </section>
+                      )}
                     </div>
                   )}
                 </div>
