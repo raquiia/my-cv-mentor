@@ -1,0 +1,162 @@
+/* CV Template Styles */
+
+/* Modern Template - Clean and professional */
+.cv-template-moderne {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.cv-template-moderne h1 {
+  color: hsl(var(--primary));
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.cv-template-moderne h2 {
+  color: hsl(var(--primary));
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid hsl(var(--primary));
+}
+
+.cv-template-moderne h3 {
+  color: hsl(var(--foreground));
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+/* Classic Template - Traditional and elegant */
+.cv-template-classique {
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.cv-template-classique h1 {
+  color: hsl(var(--foreground));
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  border-bottom: 3px double hsl(var(--border));
+  padding-bottom: 1rem;
+}
+
+.cv-template-classique h2 {
+  color: hsl(var(--foreground));
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 0.5rem;
+}
+
+.cv-template-classique h3 {
+  color: hsl(var(--foreground));
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-style: italic;
+  margin-bottom: 0.25rem;
+}
+
+/* Creative Template - Bold and colorful */
+.cv-template-creatif {
+  font-family: 'Poppins', 'Helvetica Neue', sans-serif;
+}
+
+.cv-template-creatif h1 {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.cv-template-creatif h2 {
+  color: hsl(var(--accent));
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding-left: 1rem;
+  border-left: 4px solid hsl(var(--accent));
+}
+
+.cv-template-creatif h3 {
+  color: hsl(var(--primary));
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+/* Tech Template - Modern and minimalist */
+.cv-template-tech {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+}
+
+.cv-template-tech h1 {
+  color: hsl(142, 76%, 36%);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.cv-template-tech h1::before {
+  content: '> ';
+  color: hsl(142, 76%, 36%);
+}
+
+.cv-template-tech h2 {
+  color: hsl(142, 76%, 36%);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-family: monospace;
+}
+
+.cv-template-tech h2::before {
+  content: '## ';
+  color: hsl(142, 76%, 56%);
+}
+
+.cv-template-tech h3 {
+  color: hsl(var(--foreground));
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.cv-template-tech h3::before {
+  content: '### ';
+  color: hsl(142, 76%, 76%);
+  font-size: 0.9rem;
+}
+
+/* Common styles for all templates */
+.cv-preview-content {
+  padding: 2rem;
+  min-height: 400px;
+}
+
+.cv-preview-content p {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.cv-preview-content ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.cv-preview-content li {
+  margin-bottom: 0.25rem;
+}

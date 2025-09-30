@@ -7,8 +7,10 @@ import { Upload, Download, Sparkles, Save, Eye, AlertCircle } from "lucide-react
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 import * as pdfjsLib from 'pdfjs-dist';
 import mammoth from 'mammoth';
+import '../styles/cv-templates.css';
 
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
@@ -19,6 +21,7 @@ export default function CVEditor() {
   const [cvData, setCvData] = useState<any>(null);
   const [selectedTemplate, setSelectedTemplate] = useState("moderne");
   const [isUploading, setIsUploading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isImproving, setIsImproving] = useState(false);
   const [credits, setCredits] = useState(0);
   const [originalPreviewUrl, setOriginalPreviewUrl] = useState<string | null>(null);
@@ -51,6 +54,7 @@ export default function CVEditor() {
     }
 
     setIsUploading(true);
+    setIsAnalyzing(true);
     setExtractionWarning(null);
     setOriginalPreviewUrl(null);
     
@@ -130,6 +134,7 @@ export default function CVEditor() {
       toast.error(error.message || "Erreur lors de l'upload");
     } finally {
       setIsUploading(false);
+      setIsAnalyzing(false);
     }
   };
 
@@ -205,6 +210,7 @@ export default function CVEditor() {
 
   return (
     <div className="min-h-screen bg-background">
+      {isAnalyzing && <LoadingOverlay message="Analyse du CV en cours..." />}
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -300,31 +306,31 @@ export default function CVEditor() {
               </div>
             </div>
             
-            <div className="border rounded-lg bg-white min-h-[800px] shadow-lg p-8">
+            <div className={`border rounded-lg bg-white min-h-[800px] shadow-lg cv-preview-content cv-template-${selectedTemplate}`}>
               {cvData ? (
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{cvData.name || "Votre Nom"}</h2>
-                    <p className="text-gray-600">{cvData.title || "Titre Professionnel"}</p>
+                    <h1>{cvData.name || "Votre Nom"}</h1>
+                    <p className="text-muted-foreground">{cvData.title || "Titre Professionnel"}</p>
                   </div>
                   
                   {cvData.summary && (
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Résumé</h3>
-                      <p className="text-gray-700">{cvData.summary}</p>
+                      <h2>Résumé</h2>
+                      <p>{cvData.summary}</p>
                     </div>
                   )}
 
                   {cvData.experience && (
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Expérience</h3>
-                      <div className="text-gray-700 space-y-3">
+                      <h2>Expérience</h2>
+                      <div className="space-y-3">
                         {Array.isArray(cvData.experience) ? (
                           cvData.experience.map((exp: any, idx: number) => (
                             <div key={idx} className="mb-3">
-                              <div className="font-semibold">{exp.title}</div>
-                              <div className="text-sm text-gray-600">{exp.company} • {exp.years}</div>
-                              <div className="mt-1">{exp.description}</div>
+                              <h3>{exp.title}</h3>
+                              <p className="text-sm text-muted-foreground">{exp.company} • {exp.years}</p>
+                              <p className="mt-1">{exp.description}</p>
                             </div>
                           ))
                         ) : (
@@ -336,13 +342,13 @@ export default function CVEditor() {
 
                   {cvData.education && (
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Formation</h3>
-                      <div className="text-gray-700 space-y-3">
+                      <h2>Formation</h2>
+                      <div className="space-y-3">
                         {Array.isArray(cvData.education) ? (
                           cvData.education.map((edu: any, idx: number) => (
                             <div key={idx} className="mb-3">
-                              <div className="font-semibold">{edu.degree}</div>
-                              <div className="text-sm text-gray-600">{edu.university} • {edu.years}</div>
+                              <h3>{edu.degree}</h3>
+                              <p className="text-sm text-muted-foreground">{edu.university} • {edu.years}</p>
                             </div>
                           ))
                         ) : (
@@ -354,12 +360,12 @@ export default function CVEditor() {
 
                   {cvData.skills && (
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Compétences</h3>
-                      <div className="text-gray-700">
+                      <h2>Compétences</h2>
+                      <div>
                         {Array.isArray(cvData.skills) ? (
                           <div className="flex flex-wrap gap-2">
                             {cvData.skills.map((skill: string, idx: number) => (
-                              <span key={idx} className="px-3 py-1 bg-gray-100 rounded-full text-sm">
+                              <span key={idx} className="px-3 py-1 bg-secondary rounded-full text-sm">
                                 {skill}
                               </span>
                             ))}
@@ -396,9 +402,9 @@ export default function CVEditor() {
                 {templates.map((template) => (
                   <div
                     key={template.id}
-                    className={`border-2 rounded-lg p-3 cursor-pointer transition-colors ${
+                    className={`relative border-2 rounded-lg p-3 cursor-pointer transition-all hover:scale-105 ${
                       selectedTemplate === template.id
-                        ? "border-primary bg-primary/5"
+                        ? "border-primary bg-primary/5 ring-2 ring-primary/20 shadow-lg"
                         : "border-border hover:border-primary/50"
                     }`}
                     onClick={() => setSelectedTemplate(template.id)}
@@ -408,6 +414,11 @@ export default function CVEditor() {
                       alt={template.name}
                       className="aspect-[3/4] w-full object-cover rounded mb-2"
                     />
+                    {selectedTemplate === template.id && (
+                      <div className="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-semibold">
+                        Sélectionné
+                      </div>
+                    )}
                     <p className="text-sm font-medium text-center">{template.name}</p>
                   </div>
                 ))}
